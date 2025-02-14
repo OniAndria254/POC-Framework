@@ -9,7 +9,7 @@ SET "APP_NAME=Ticketing"
 
 REM Définition des répertoires
 SET "TEMP_DIR=temp_%APP_NAME%"
-SET "SRC_DIR=C:\e-bossy\S4\Web Dyn\POC\Ticketing\src"
+SET "SRC_DIR=C:\e-bossy\S4\Web Dyn\POC-Framework\src"
 SET "CLASSES_DIR=%TEMP_DIR%\WEB-INF\classes"
 SET "VIEWS_DIR=%TEMP_DIR%"
 SET "LIB=%TEMP_DIR%\WEB-INF\lib"

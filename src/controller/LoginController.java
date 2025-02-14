@@ -131,7 +131,7 @@ public class LoginController {
     }
 
     // Login processing
-    @Post
+    @Get
     @Url(chemin = "/login/process")
     public ModelView processLogin(@Param(paramName = "username") String username, 
                                 @Param(paramName = "password") String password) {
