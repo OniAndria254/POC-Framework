@@ -6,6 +6,7 @@ public class Column {
     private String nomColonneBase;
     private String typeColonne;
     
+
     public String getNomColonneBase() {
         return nomColonneBase;
     }

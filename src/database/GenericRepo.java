@@ -34,6 +34,7 @@ public class GenericRepo<T>{
             }
             return obj;
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new SQLException("Erreur lors de l'insertion/la mise à jour de donnée");
         }
     }
@@ -86,20 +87,18 @@ public class GenericRepo<T>{
 
         String tableName = DBUtil.getTableName(clazz);
         List<Column> columns = DBUtil.getColumns(clazz);
-//        System.out.println(columns.size());
         List<DBColumn> dbColumns = DBColumn.getDBColumns(tableName, connection);
-//        System.out.println(dbColumns.size());
         DBUtil.verifyColumns(columns, dbColumns);
 
         String query = "SELECT * FROM " + tableName + " where 1=1";
-        if(afterWhere!=null){
+        if (afterWhere != null) {
             query += afterWhere;
         }
 
         List<T> resultList = new ArrayList<>();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 T obj = clazz.getDeclaredConstructor().newInstance();
@@ -107,41 +106,49 @@ public class GenericRepo<T>{
                 for (Column column : columns) {
                     String columnName = column.getNomColonneClasse();
                     Field field = clazz.getDeclaredField(columnName);
-                    field.setAccessible(true); 
+                    field.setAccessible(true);
                     Object value = resultSet.getObject(columnName);
-                    if(field.getType().getName().equals("double")){
+
+                    // 🔥 Conversion de Timestamp en LocalDateTime
+                    if (value instanceof Timestamp) {
+                        value = ((Timestamp) value).toLocalDateTime();
+                    }
+
+                    if (field.getType().getName().equals("double")) {
                         value = resultSet.getDouble(columnName);
                     }
+
                     field.set(obj, value);
                 }
 
-                resultList.add(obj); 
+                resultList.add(obj);
             }
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException |
-                InvocationTargetException | NoSuchMethodException e) {
+                 InvocationTargetException | NoSuchMethodException e) {
             throw new SQLException("Erreur lors de la création des objets", e);
         }
 
         return resultList;
     }
 
+
     public static <T> T findById(String id, Class<T> clazz) throws SQLException, MismatchException {
         PGConnect pgConnect = PGConnect.getInstance();
         Connection connection = pgConnect.getConnection();
-    
+
         String tableName = DBUtil.getTableName(clazz);
         List<Column> columns = DBUtil.getColumns(clazz);
         List<DBColumn> dbColumns = DBColumn.getDBColumns(tableName, connection);
         DBUtil.verifyColumns(columns, dbColumns);
-    
+
         String query = "SELECT * FROM " + tableName + " WHERE id = ?";
-    
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, id);  
+            preparedStatement.setString(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     T obj = clazz.getDeclaredConstructor().newInstance();
-    
+
                     for (Column column : columns) {
                         String columnName = column.getNomColonneClasse();
                         Field field = clazz.getDeclaredField(columnName);
@@ -154,18 +161,18 @@ public class GenericRepo<T>{
                         }
                         field.set(obj, value);
                     }
-    
-                    return obj; 
+
+                    return obj;
                 }
             } catch (NoSuchFieldException | IllegalAccessException | InstantiationException |
                      InvocationTargetException | NoSuchMethodException e) {
                 throw new SQLException("Error while creating object", e);
             }
         }
-    
-        return null;  
+
+        return null;
     }
-    
+
 
     public static <T> void remove(T obj) throws SQLException, MismatchException {
         Class<?> clazz = obj.getClass();

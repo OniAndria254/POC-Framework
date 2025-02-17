@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lib1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/temp_Ticketing/WEB-INF/lib/postgresql-42.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/temp_Ticketing/WEB-INF/lib/myServlet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/temp_Ticketing/WEB-INF/lib/gson-2.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/temp_Ticketing/WEB-INF/lib/servlet-api.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

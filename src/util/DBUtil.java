@@ -91,8 +91,8 @@ public class DBUtil {
 
     public static boolean verifyColumns(List<Column> colonneClasse, List<DBColumn> colonneBase) throws MismatchException {
         if (colonneBase.size() != colonneClasse.size()) {
-            System.out.println(colonneBase.size());
-            System.out.println(colonneClasse.size());
+            System.out.println("colonne base: " + colonneBase.size());
+            System.out.println("colonne classe: " + colonneClasse.size());
             throw new MismatchException("nombre de colonnes invalide");
         }
         for (int i = 0; i < colonneClasse.size(); i++) {

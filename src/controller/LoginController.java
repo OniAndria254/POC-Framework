@@ -1,9 +1,14 @@
 package controller;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 
+import database.GenericRepo;
+import exception.MismatchException;
 import mg.itu.prom16.annotation.*;
 import mg.itu.prom16.model.*; 
 import model.*;
+import util.Utils;
 
 @MyControllerAnnotation("login")
 public class LoginController {
@@ -131,24 +136,33 @@ public class LoginController {
     }
 
     // Login processing
-    @Get
+    @Post
     @Url(chemin = "/login/process")
     public ModelView processLogin(@Param(paramName = "username") String username, 
                                 @Param(paramName = "password") String password) {
         ModelView mv = new ModelView();
+        Utilisateur u = null;
+        try {
+            u = Utils.checkLogin(username, password);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
-        // Verify credentials (replace with your actual authentication logic)
-        if ("admin".equals(username) && "admin123".equals(password)) {
-            sess.update("connectedUser", username);
-            sess.update("userProfile", "ADMIN");
-            mv.setUrl("/admin/dashboard");
-        } else if ("user".equals(username) && "user123".equals(password)) {
-            sess.update("connectedUser", username);
-            sess.update("userProfile", "USER");
-            mv.setUrl("/user/dashboard");
-        } else {
+        if (u == null) {
             mv.setUrl("/login.jsp");
-            mv.addObject("errorMessage", "Invalid credentials");
+            mv.addObject("errorMessage", "Vérifiez vos informations");
+        }
+
+        else if(u.getRole().equals("ADMIN")) {
+            sess.update("connectedUser", u);
+            sess.update("userProfile", u.getRole());
+            mv.setUrl("/admin/dashboard");
+        }
+        else {
+            sess.update("connectedUser", u);
+            sess.update("userProfile", u.getRole());
+            mv.setUrl("/user/dashboard");
         }
         
         return mv;
