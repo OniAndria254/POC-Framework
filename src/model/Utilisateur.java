@@ -2,6 +2,7 @@ package model;
 
 import annotation.Colonne;
 import annotation.Table;
+import database.GenericRepo;
 
 @Table(prefixe = "USR")
 public class Utilisateur {
@@ -45,5 +46,8 @@ public class Utilisateur {
         this.role = role;
     }
 
+    public static Utilisateur getById(String id) throws Exception {
+        return GenericRepo.findById(id, Utilisateur.class);
+    }
     
 }

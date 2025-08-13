@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import annotation.Colonne;
 import annotation.Table;
+import mg.itu.prom16.annotation.Required;
 
 @Table(nom = "vol", prefixe = "VOL")
 public class Vol {
@@ -16,7 +17,9 @@ public class Vol {
     private double prix_eco;
     private LocalDateTime date_depart;
     private LocalDateTime date_arrivee;
+    @Required
     private String id_ville_depart;
+    @Required
     private String id_ville_arrivee;
     private String id_avion;
 

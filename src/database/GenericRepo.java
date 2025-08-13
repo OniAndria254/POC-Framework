@@ -3,7 +3,9 @@ package database;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,14 +111,25 @@ public class GenericRepo<T>{
                     field.setAccessible(true);
                     Object value = resultSet.getObject(columnName);
 
-                    // 🔥 Conversion de Timestamp en LocalDateTime
-                    if (value instanceof Timestamp) {
-                        value = ((Timestamp) value).toLocalDateTime();
+                    // Inside the while(resultSet.next()) loop, before field.set(obj, value):
+
+                    if (value != null) {
+                        // System.out.println(value);
+                        if (field.getType().getName().equals("double")) {
+                            value = resultSet.getDouble(columnName);
+                        }
+                        if (value instanceof BigDecimal) {
+                            if (field.getType() == Double.class || field.getType().getName().equals("double")) {
+                                value = ((BigDecimal) value).doubleValue();
+                            }
+                        }
+                        if (value instanceof Timestamp && field.getType() == LocalDateTime.class) {
+                            value = ((Timestamp) value).toLocalDateTime();
+                        }
+                        
                     }
 
-                    if (field.getType().getName().equals("double")) {
-                        value = resultSet.getDouble(columnName);
-                    }
+                    // field.set(obj, value);
 
                     field.set(obj, value);
                 }
@@ -154,13 +167,25 @@ public class GenericRepo<T>{
                         Field field = clazz.getDeclaredField(columnName);
                         field.setAccessible(true);
                         Object value = resultSet.getObject(columnName);
-                        if(field.getType().getName().equals("double")){
+                    
+                        if (field.getType().getName().equals("double")) {
                             value = resultSet.getDouble(columnName);
+                        } else if (field.getType() == Double.class) {
+                            // Gérer les champs de type Double (objet)
+                            if (value instanceof BigDecimal) {
+                                value = ((BigDecimal) value).doubleValue();
+                            } else if (value != null) {
+                                value = resultSet.getDouble(columnName);
+                            }
                         } else if (field.getType().getName().equals("java.time.LocalDateTime")) {
-                            value = ((Timestamp) value).toLocalDateTime();
+                            if (value instanceof Timestamp) {
+                                value = ((Timestamp) value).toLocalDateTime();
+                            }
                         }
+                    
                         field.set(obj, value);
                     }
+                    
 
                     return obj;
                 }

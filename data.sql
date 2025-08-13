@@ -8,6 +8,8 @@ CREATE SEQUENCE seq_statut START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE seq_reservation START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE seq_promotion START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE seq_config_reservation START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE seq_booking START WITH 1 INCREMENT BY 1;
+
 
 -- Insertion des utilisateurs
 INSERT INTO utilisateur (id, username, password, role)
@@ -45,7 +47,8 @@ VALUES ('VOL' || nextval('seq_vol'), 500.00, 200.00, '2025-01-15 14:00:00', '202
 
 -- Insertion des statuts
 INSERT INTO statut (id, libelle)
-VALUES ('STA' || nextval('seq_statut'), 'Reservé');
+VALUES ('STA' || nextval('seq_statut'), 'Reservé'),
+VALUES ('STA' || nextval('seq_statut'), 'Annulé');
 
 -- Insertion des réservations
 INSERT INTO reservation (id, Id_statut, Id_type_siege, Id_vol, Id_utilisateur)
@@ -54,10 +57,10 @@ VALUES ('RES' || nextval('seq_reservation'), 'STA1', 'TYP1', 'VOL1', 'USR2'),
        ('RES' || nextval('seq_reservation'), 'STA1', 'TYP2', 'VOL3', 'USR3');
 
 -- Insertion des promotions
-INSERT INTO promotion (id, Id_vol, Id_type_siege, pourcentage_promotion, nb_sieges_promotion, date_debut, date_fin)
-VALUES ('PRO' || nextval('seq_promotion'), 'VOL1', 'TYP1', 10.00, 5, '2025-01-01 00:00:00', '2025-01-14 23:59:59'),
-       ('PRO' || nextval('seq_promotion'), 'VOL2', 'TYP2', 15.00, 10, '2025-01-01 00:00:00', '2025-01-15 23:59:59'),
-       ('PRO' || nextval('seq_promotion'), 'VOL3', 'TYP2', 20.00, 8, '2025-01-01 00:00:00', '2025-01-16 23:59:59');
+INSERT INTO promotion (id, Id_vol, Id_type_siege, pourcentage_promotion, nb_sieges_promotion, nb_sieges_restants, date_debut, date_fin)
+VALUES ('PRO' || nextval('seq_promotion'), 'VOL1', 'TYP1', 10.00, 5, 5,'2025-01-01 00:00:00', '2025-01-14 23:59:59'),
+       ('PRO' || nextval('seq_promotion'), 'VOL2', 'TYP2', 15.00, 10, 10,'2025-01-01 00:00:00', '2025-01-15 23:59:59'),
+       ('PRO' || nextval('seq_promotion'), 'VOL3', 'TYP2', 20.00, 8, 8, '2025-01-01 00:00:00', '2025-01-16 23:59:59');
 
 -- Insertion de la configuration de réservation
 INSERT INTO config_reservation (id, nb_heure_res, nb_heure_annulation)

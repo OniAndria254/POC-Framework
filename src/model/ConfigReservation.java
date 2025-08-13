@@ -2,6 +2,7 @@ package model;
 import java.time.LocalDateTime;
 
 import annotation.Table;
+import mg.itu.prom16.annotation.Range;
 
 @Table(nom = "config_reservation", prefixe = "CON")
 public class ConfigReservation {

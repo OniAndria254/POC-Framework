@@ -14,6 +14,7 @@ import mg.itu.prom16.annotation.Post;
 import mg.itu.prom16.annotation.Url;
 import mg.itu.prom16.model.ModelView;
 import model.ConfigReservation;
+import model.Promotion;
 
 @MyControllerAnnotation("config")
 public class ConfigReservationController {
@@ -32,7 +33,7 @@ public class ConfigReservationController {
         //     e.printStackTrace();
         // }
 
-        mv.setUrl("/admin/config/new.jsp"); // Redirection vers la liste des configurations après insertion
+        mv.setUrl("/admin/config/new.jsp");
         return mv;
     }
 
@@ -40,25 +41,20 @@ public class ConfigReservationController {
     @Post
     @Auth(profile = "ADMIN")
     @Url(chemin = "/config/save")
-    public ModelView save(@Param(paramName = "nb_heure_res") String nbHeureRes,
-                          @Param(paramName = "nb_heure_annulation") String nbHeureAnnulation) {
+    public ModelView save(@Param(paramName = "config") ConfigReservation configReservation) {
         ModelView mv = new ModelView();
-        ConfigReservation config = new ConfigReservation();
 
         try {
-            config.setNb_heure_res(Integer.parseInt(nbHeureRes));
-            config.setNb_heure_annulation(Integer.parseInt(nbHeureAnnulation));
-            config.setDate_config(java.time.LocalDateTime.now());
+            GenericRepo.save(configReservation);
+            // System.out.println(configReservation.toString());
 
-            GenericRepo.save(config);
-
-            List<ConfigReservation> configs = GenericRepo.findAll(ConfigReservation.class);
-            mv.addObject("configs", configs);
+            // List<ConfigReservation> configs = GenericRepo.findAll(ConfigReservation.class);
+            // mv.addObject("configs", configs);
         } catch (SQLException | MismatchException e) {
             e.printStackTrace();
         }
+        mv.setUrl("redirect:/admin/config/new");
 
-        mv.setUrl("/admin/config/new.jsp"); // Redirection vers la liste des configurations après insertion
         return mv;
     }
 }

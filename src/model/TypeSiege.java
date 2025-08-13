@@ -3,6 +3,7 @@ package model;
 import java.util.Objects;
 
 import annotation.Table;
+import database.GenericRepo;
 
 @Table(nom = "type_siege", prefixe = "TYP")
 public class TypeSiege {
@@ -55,5 +56,9 @@ public class TypeSiege {
                 "id='" + id + '\'' +
                 ", nom_type='" + nom_type + '\'' +
                 '}';
+    }
+    
+    public static TypeSiege getById(String id) throws Exception {
+        return GenericRepo.findById(id, TypeSiege.class);
     }
 }

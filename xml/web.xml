@@ -22,5 +22,17 @@
         <param-name>controllerPackage</param-name>
         <param-value>controller</param-value>
     </context-param>
+
+    <context-param>
+        <param-name>pdfApiBaseUrl</param-name>
+        <param-value>http://localhost:8081</param-value>
+    </context-param>
+
+    
+    <context-param>
+        <param-name>test</param-name>
+        <param-value>http://localhost:8000</param-value>
+    </context-param>
+
     
 </web-app>

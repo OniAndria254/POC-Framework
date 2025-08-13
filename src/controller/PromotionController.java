@@ -6,12 +6,14 @@ import java.util.List;
 import database.GenericRepo;
 import exception.MismatchException;
 import mg.itu.prom16.annotation.Auth;
+import mg.itu.prom16.annotation.ErrorPage;
 import mg.itu.prom16.annotation.Get;
 import mg.itu.prom16.annotation.MyControllerAnnotation;
 import mg.itu.prom16.annotation.Param;
 import mg.itu.prom16.annotation.Post;
 import mg.itu.prom16.annotation.Url;
 import mg.itu.prom16.model.ModelView;
+import mg.itu.prom16.model.Utility;
 import model.Avion;
 import model.Promotion;
 import model.TypeSiege;
@@ -47,25 +49,24 @@ public class PromotionController {
     @Post
     @Auth(profile = "ADMIN")
     @Url(chemin = "/promotion/save")
-    public ModelView savePromotion(@Param(paramName = "promotion") Promotion promotion) {
+    public ModelView savePromotion(@Param(paramName = "promotion") Promotion promotion) throws Exception{
         ModelView mv = new ModelView();
+        promotion.setNb_sieges_restants(promotion.getNb_sieges_promotion());
+        List<Promotion> promotions = GenericRepo.findAll(Promotion.class);
+        List<Vol> vols = GenericRepo.findAll(Vol.class);
+        List<TypeSiege> typesSiege = GenericRepo.findAll(TypeSiege.class);
 
-        try {
+        mv.addObject("promotions", promotions);
+        mv.addObject("vols", vols);
+        mv.addObject("typesSiege", typesSiege);
+        if (Utility.isValid(promotion)) {
             GenericRepo.save(promotion);
-
-            List<Promotion> promotions = GenericRepo.findAll(Promotion.class);
-            List<Vol> vols = GenericRepo.findAll(Vol.class);
-            List<TypeSiege> typesSiege = GenericRepo.findAll(TypeSiege.class);
-
-            mv.addObject("promotions", promotions);
-            mv.addObject("vols", vols);
-            mv.addObject("typesSiege", typesSiege);
-            
-        } catch (SQLException | MismatchException e) {
-            e.printStackTrace();
+            mv.setUrl("/admin/promotion/new.jsp");
+        }
+        else {
+            mv.setErrorUrl("/promotion/new");
         }
 
-        mv.setUrl("/admin/promotion/new.jsp");
         return mv;
     }
 

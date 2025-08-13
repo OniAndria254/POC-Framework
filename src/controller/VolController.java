@@ -1,27 +1,27 @@
 package controller;
 
 import java.sql.SQLException;
+import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
 import java.util.List;
 
 import database.GenericRepo;
 import exception.MismatchException;
-import mg.itu.prom16.annotation.Auth;
-import mg.itu.prom16.annotation.Get;
-import mg.itu.prom16.annotation.MyControllerAnnotation;
-import mg.itu.prom16.annotation.Param;
-import mg.itu.prom16.annotation.Post;
-import mg.itu.prom16.annotation.Url;
+import mg.itu.prom16.annotation.*;
+import mg.itu.prom16.model.AttributeSession;
 import mg.itu.prom16.model.ModelView;
+import mg.itu.prom16.model.Utility;
 import model.Avion;
-import model.Employe;
+import model.Utilisateur;
 import model.Ville;
 import model.Vol;
 
 @MyControllerAnnotation("vol")
 public class VolController {
+    AttributeSession sess;
+    
     @Get
-    @Auth(profile = "ADMIN")
+    @Auth
     @Url(chemin = "/vol/list")
     public ModelView list() throws SQLException, MismatchException {
         ModelView mv = new ModelView();
@@ -32,12 +32,16 @@ public class VolController {
         mv.addObject("villes", villes);
         mv.addObject("avions", avions);
 
-        mv.setUrl("/admin/vol/list.jsp");
+        Utilisateur u = (Utilisateur) sess.get("connectedUser");
+        if(u.getRole().equals("ADMIN")) mv.setUrl("/admin/vol/list.jsp");
+        else mv.setUrl("/user/vol/list.jsp");
+
         return mv;
     }
 
+
     @Get
-    @Auth(profile = "ADMIN")
+    @Auth
     @Url(chemin = "/vol/filter")
     public ModelView filter(
         @Param(paramName = "id_ville_depart") String idVilleDepart,
@@ -93,7 +97,9 @@ public class VolController {
             e.printStackTrace();
         }
 
-        mv.setUrl("/admin/vol/list.jsp"); // Rediriger vers la page avec les résultats filtrés
+        Utilisateur u = (Utilisateur) sess.get("connectedUser");
+        if(u.getRole().equals("ADMIN")) mv.setUrl("/admin/vol/list.jsp");
+        else mv.setUrl("/user/vol/list.jsp");
         return mv;
     }
 
@@ -119,20 +125,19 @@ public class VolController {
     @Post
     @Auth(profile = "ADMIN")
     @Url(chemin = "/vol/save")
-    public ModelView save(@Param(paramName = "vol") Vol vol) throws SQLException, MismatchException {
+    public ModelView save(@Param(paramName = "vol") Vol vol) throws Exception {
 
-        try {
+        ModelView mv = new ModelView();
+
+        if (Utility.isValid(vol)) {
+            System.out.println("misave");
             GenericRepo.save(vol);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MismatchException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            mv.setUrl("redirect:/vol/list");
         }
-      
-
-        return this.list();
+        else {      
+            mv.setErrorUrl("/vol/new");
+        }
+        return mv;
     }
 
     @Get
@@ -159,8 +164,9 @@ public class VolController {
         Vol vol = GenericRepo.findById(id, Vol.class);
         GenericRepo.remove(vol);
         
-
-        return this.list();
+        ModelView mv = new ModelView();
+        mv.setUrl("redirect:/vol/list");
+        return mv;
     }
 
 }
